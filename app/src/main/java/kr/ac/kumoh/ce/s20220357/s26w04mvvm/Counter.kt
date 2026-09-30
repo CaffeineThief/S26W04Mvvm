@@ -25,7 +25,9 @@ import androidx.compose.ui.unit.sp
 fun Counter(
     modifier: Modifier = Modifier,
     count: Int,
-    onChangeCount: (Int) -> Unit,
+    onIncrement: () -> Unit,
+    onDecrement: () -> Unit,
+    onReset: () -> Unit,
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
 
@@ -52,7 +54,7 @@ fun Counter(
             Button(
                 modifier = Modifier.weight(1f),
                 onClick = {
-                    onChangeCount(count + 1)
+                    onIncrement()
                 }
             ) {
                 Text("+", fontSize = 30.sp)
@@ -61,7 +63,7 @@ fun Counter(
             if(expanded) {
                 Button(
                     onClick = {
-                        onChangeCount(count - 1)
+                        onDecrement()
                         expanded = false
                     }
                 ) {
@@ -70,7 +72,7 @@ fun Counter(
 
                 Button(
                     onClick = {
-                        onChangeCount(0)
+                        onReset()
                         expanded = false
                     }
                 ) {
