@@ -8,10 +8,17 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import kr.ac.kumoh.ce.s20220357.s26w04mvvm.ui.theme.S26W04MvvmTheme
 
 class MainActivity : ComponentActivity() {
@@ -35,7 +42,22 @@ fun MainScreen(
 //    var count by retain { mutableIntStateOf(0) }
     val counterState by viewModel.counter.collectAsStateWithLifecycle()
 
-    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+
+    // key1에 아무 값도 주지 않아서 (Unit 지정), 최초 한 번만 실행
+    LaunchedEffect(key1 = Unit) {
+        viewModel.events.collectLatest { message ->
+            scope.launch {
+                snackbarHostState.showSnackbar(message)
+            }
+        }
+    }
+
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+    ) { innerPadding ->
         Counter(
             modifier = Modifier.padding(innerPadding),
             count = counterState.count,
